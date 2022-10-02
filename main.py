@@ -6,23 +6,29 @@ from views.base import View
 
 
 def main():
-    # deck = Deck()
-    # view = View()
-    # game = Controller(deck, view)
-    # game.run()
 
-    tournament = models.Tournament("super tournoi",
-                                   "Nantes",
-                                   '19-09-22 13:55:26',
-                                   '19-09-22 13:55:26',
-                                   'Blitz',
-                                   ''
-                                   )
+    model = models.Tournament("super tournoi",
+                              "Nantes",
+                              '19-09-22 13:55:26',
+                              '19-09-22 13:55:26',
+                              'Blitz',
+                              ''
+                              )
 
     view = View()
 
     # Create tournament
-    chess_tournament = Controller(tournament, view)
+
+    c = Controller(model, view)
+
+    # todo créer une fonction run() dans le controller qui fait les actions ci-dessous
+    c.add_players()
+    #
+    # # Tour 1 ######################################################################
+    t1 = c.create_tour_and_matches()
+    #
+    # # Saisie des résultats du tour 1
+    c.maj_scores(tour=t1)
 
 
 if __name__ == "__main__":

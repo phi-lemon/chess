@@ -1,6 +1,5 @@
 """Define the main controller."""
 from models import models
-from views.base import View
 from create_pairs import create_first_tour_pairs, create_tour_pairs
 
 
@@ -39,20 +38,6 @@ class Controller:
             tour.add_match(match_id, id_player1, id_player2)
             match_id += 1
 
-    @staticmethod
-    def print_matches(tour):
-        print(f"Matches tour {tour.tour_id}")
-        for v in tour.matches.values():
-            print(f"Scores match {v.match_id:<5} p{v.id_player_1}: {v.score_match_player_1:3} / "
-                  f"p{v.id_player_2}: {v.score_match_player_2:3}")
-
-    def print_infos_joueurs(self):
-        # todo trier par score décroissant
-        print('\nInfos joueurs')
-        for v in self.tournament.players.values():
-            print(f"Id: {v.player_id:<2} | {v.firstname:>12} {v.lastname:12} | Score: {v.score:2}")
-        print('\n')
-
     def maj_scores(self, tour):
         for i in range(len(tour.matches)):
             s = self.view.prompt_for_scores(tour.name, tour.matches[i+1].match_id)
@@ -68,6 +53,12 @@ class Controller:
             id_player_2 = tour.matches[i+1].id_player_2
             self.tournament.players[id_player_1].score += score_match_player_1
             self.tournament.players[id_player_2].score += score_match_player_2
+
+        # Print infos match
+        self.view.print_matches(tour)
+
+        # Print infos players
+        self.view.print_infos_players(self.tournament.players)
 
     def add_players(self):
         # for i in range(2):
@@ -98,55 +89,3 @@ class Controller:
                                        i[4],
                                        i[5]
                                        )
-
-
-model = models.Tournament("super tournoi",
-                          "Nantes",
-                          '19-09-22 13:55:26',
-                          '19-09-22 13:55:26',
-                          'Blitz',
-                          ''
-                          )
-
-c = Controller(model, View())
-c.add_players()
-
-# Tour 1 ######################################################################
-t1 = c.create_tour_and_matches()
-
-# Saisie des résultats du tour 1
-c.maj_scores(tour=t1)
-
-
-c.print_matches(t1)
-c.print_infos_joueurs()
-
-
-# Tour 2 ######################################################################
-t2 = c.create_tour_and_matches()
-
-# Saisie des résultats du tour 2
-c.maj_scores(tour=t2)
-
-c.print_matches(t2)
-c.print_infos_joueurs()
-
-
-# Tour 3 ######################################################################
-t3 = c.create_tour_and_matches()
-
-# Saisie des résultats du tour 2
-c.maj_scores(tour=t3)
-
-c.print_matches(t3)
-c.print_infos_joueurs()
-
-
-# Tour 4 ######################################################################
-t4 = c.create_tour_and_matches()
-
-# Saisie des résultats du tour 2
-c.maj_scores(tour=t4)
-
-c.print_matches(t4)
-c.print_infos_joueurs()

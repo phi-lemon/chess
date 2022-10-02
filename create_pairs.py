@@ -47,6 +47,7 @@ def create_tour_pairs(players):
     # sort by rank if score is same
     players_sorted = []
     i = 0
+    # todo tuple unpacking
     while i < len(players_sorted_by_score):
         players_sorted.append(players_sorted_by_score[i])
         # compare scores
