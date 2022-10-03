@@ -8,6 +8,18 @@ class Controller:
         self.tournament = tournament
         self.view = view
 
+    def create_tournament(self):
+        tournament_params = self.view.prompt_for_tournament()
+        self.tournament.add_tournament_infos(
+            tournament_params['name'],
+            tournament_params['place'],
+            tournament_params['date_begin'],
+            tournament_params['date_end'],
+            tournament_params['tournament_type'],
+            tournament_params['description'],
+            tournament_params['nb_tours']
+            )
+
     def create_tour_and_matches(self):
         """
         Method that creates a tour, then creates pairs of players, then create matches for this tour
@@ -61,31 +73,22 @@ class Controller:
         self.view.print_infos_players(self.tournament.players)
 
     def add_players(self):
-        # for i in range(2):
-        # todo : id will be PK with autoincrement in bdd
+        nb_of_players = self.view.prompt_for_nb_of_players()
+        for i in range(nb_of_players):
+            # todo : id will be PK with autoincrement in bdd
+            p = self.view.prompt_for_player()
+            self.tournament.add_player(i + 1,
+                                       p['firstname'],
+                                       p['lastname'],
+                                       p['birthdate'],
+                                       p['gender'],
+                                       p['rank'])
 
-        #     p = self.view.prompt_for_player()
-        #     self.tournament.add_player(i + 1,
-        #                                p['firstname'],
-        #                                p['lastname'],
-        #                                p['birthdate'],
-        #                                p['gender'],
-        #                                p['rank'])
-        players = [
-            (1, 'Titi', 'Durand', '07-05-76', 'M', 20),
-            (2, 'Mathilde', 'Dupont', '04-07-95', 'F', 29),
-            (3, 'Gaston', 'Martin', '04-07-95', 'M', 1),
-            (4, 'George', 'Harisson', '04-07-95', 'M', 55),
-            (5, 'John', 'Lennon', '04-07-95', 'M', 8),
-            (6, 'Alphonse', 'Daudet', '04-07-95', 'M', 34),
-            (7, 'Ringo', 'Star', '04-07-95', 'M', 76),
-            (8, 'Dee Dee', 'Bridgewater', '04-07-95', 'F', 10)
-        ]
-        for i in players:
-            self.tournament.add_player(i[0],
-                                       i[1],
-                                       i[2],
-                                       i[3],
-                                       i[4],
-                                       i[5]
-                                       )
+    def run(self):
+        # update instance of empty Tournament that has been created in __init__
+        self.create_tournament()
+        self.add_players()
+
+        for i in range(self.tournament.nb_tours):
+            tour = self.create_tour_and_matches()
+            self.maj_scores(tour)

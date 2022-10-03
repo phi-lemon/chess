@@ -2,7 +2,21 @@ from datetime import datetime
 
 
 class Tournament:
-    def __init__(self, name, place, date_begin, date_end, tournament_type, description, nb_tours=4):
+    def __init__(self):
+        """
+        Intialize tournament with empty values. Use add_tournament_infos to update instance
+        """
+        self.name = None
+        self.place = None
+        self.date_begin = None
+        self.date_end = None
+        self.nb_tours = 4
+        self.tournament_type = None
+        self.description = None
+        self.players = {}
+        self.tours = []
+
+    def add_tournament_infos(self, name, place, date_begin, date_end, tournament_type, description, nb_tours=4):
         """
         :param name:
         :param place:
@@ -24,7 +38,6 @@ class Tournament:
 
     def add_player(self, player_id, firstname, lastname, birthdate, sex, rank):
         self.players[player_id] = Player(player_id, firstname, lastname, birthdate, sex, rank, self)
-        # return self.players[player_id]
 
     def add_tour(self, tour):
         self.tours.append(tour)
@@ -92,7 +105,6 @@ class Tour:
         :return:
         """
         self.matches[match_id] = Match(match_id, self, id_player_1, id_player_2)
-        # return self.matches[match_id]
 
 
 class Match:

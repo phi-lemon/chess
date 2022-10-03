@@ -1,6 +1,25 @@
 class View:
 
     @staticmethod
+    def prompt_for_tournament():
+        tournament = dict()
+        tournament['name'] = input("Name: ")
+        tournament['place'] = input("Place: ")
+        tournament['date_begin'] = input("Begin date: ")
+        tournament['date_end'] = input("End date: ")
+        tournament['tournament_type'] = input("Type: ")
+        tournament['description'] = input("Description: ")
+        tournament['nb_tours'] = int(input("Number of rounds: "))
+        # todo gestion des erreurs
+        return tournament
+
+    @staticmethod
+    def prompt_for_nb_of_players():
+        nb_players = int(input("Number of players: "))
+        # todo gestion des erreurs
+        return nb_players
+
+    @staticmethod
     def prompt_for_player():
         player = dict()
         player['firstname'] = input("Player lastname: ")
