@@ -1,3 +1,7 @@
+from datetime import datetime
+from views.validate_input import validate_user_input as vui
+
+
 class View:
 
     @staticmethod
@@ -5,18 +9,24 @@ class View:
         tournament = dict()
         tournament['name'] = input("Name: ")
         tournament['place'] = input("Place: ")
-        tournament['date_begin'] = input("Begin date: ")
-        tournament['date_end'] = input("End date: ")
-        tournament['tournament_type'] = input("Type: ")
+        try:
+            tournament['date_begin'] = vui("Begin date (dd-mm-yyyy hh:mm:ss) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
+            tournament['date_begin'] = datetime.strptime(tournament['date_begin'], '%d-%m-%Y %H:%M:%S')
+        except ValueError:
+            print("Incorrect date string")
+        try:
+            tournament['date_end'] = vui("End date (dd-mm-yyyy hh:mm:ss) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
+            tournament['date_end'] = datetime.strptime(tournament['date_end'], '%d-%m-%Y %H:%M:%S')
+        except ValueError:
+            print("Incorrect date string")
+        tournament['tournament_type'] = vui("Type ('Blitz', 'Bullet', 'Coup rapide'): ", range_=('Blitz', 'Bullet', 'Coup rapide'))
         tournament['description'] = input("Description: ")
-        tournament['nb_tours'] = int(input("Number of rounds: "))
-        # todo gestion des erreurs
+        tournament['nb_tours'] = vui("Number of rounds: ", int, min_=1)
         return tournament
 
     @staticmethod
     def prompt_for_nb_of_players():
-        nb_players = int(input("Number of players: "))
-        # todo gestion des erreurs
+        nb_players = vui("Number of players: ", int, range_=(range(2, 1000, 2)))
         return nb_players
 
     @staticmethod
@@ -24,26 +34,40 @@ class View:
         player = dict()
         player['firstname'] = input("Player lastname: ")
         player['lastname'] = input("Player firstname: ")
-        player['birthdate'] = input("Birthdate: ")
-        player['gender'] = input("Gender: ")
-        player['rank'] = input("Rank: ")
-        # todo gestion des erreurs
+        try:
+            player['birthdate'] = vui("Birthdate (dd-mm-yyyy) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4}')
+            player['birthdate'] = datetime.strptime(player['birthdate'], '%d-%m-%Y')
+        except ValueError:
+            print("Incorrect date string")
+        player['gender'] = vui("Gender (F/M/N): ", range_=('F', 'M', 'N'))
+        player['rank'] = vui("Rank: ", type_=float, min_=0)
         return player
 
     @staticmethod
     def prompt_for_tour():
         tour = dict()
         tour['name'] = input("Tour name: ")
-        tour['date_begin'] = input("Begin date: ")
-        tour['date_end'] = input("End date: ")
+        try:
+            tour['date_begin'] = vui("Begin date (dd-mm-yyyy hh:mm:ss) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
+            tour['date_begin'] = datetime.strptime(tour['date_begin'], '%d-%m-%Y %H:%M:%S')
+        except ValueError:
+            print("Incorrect date string")
+        try:
+            tour['date_end'] = vui("End date (dd-mm-yyyy hh:mm:ss) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
+            tour['date_end'] = datetime.strptime(tour['date_end'], '%d-%m-%Y %H:%M:%S')
+        except ValueError:
+            print("Incorrect date string")
         return tour
 
     @staticmethod
     def prompt_for_scores(tour, match):
         print('scores du tour ' + tour, 'match ' + str(match))
         scores = dict()
-        scores['player_1'] = float(input("Score player 1: "))
-        scores['player_2'] = float(input("Score player 2: "))
+        check = 0
+        while check != 1:
+            scores['player_1'] = vui("Score player 1 (0 / 0.5 / 1): ", type_=float, range_=(0, 0.5, 1))
+            scores['player_2'] = vui("Score player 2 (0 / 0.5 / 1): ", type_=float, range_=(0, 0.5, 1))
+            check = scores['player_1'] + scores['player_2']
         return scores
 
     @staticmethod
@@ -60,3 +84,7 @@ class View:
         for v in players.values():
             print(f"Id: {v.player_id:<2} | {v.firstname:>12} {v.lastname:12} | Score: {v.score:2}")
         print('\n')
+
+
+# todo menu new tournament, add players (only before tournament is started), update ranks, reports
+

@@ -55,8 +55,6 @@ class Controller:
             s = self.view.prompt_for_scores(tour.name, tour.matches[i+1].match_id)
             score_match_player_1 = s['player_1']
             score_match_player_2 = s['player_2']
-            if score_match_player_1 + score_match_player_2 != 1:
-                raise ValueError("Sum of players scores must be equal to 1")
             # Update match scores
             tour.matches[i+1].score_match_player_1 = score_match_player_1
             tour.matches[i+1].score_match_player_2 = score_match_player_2

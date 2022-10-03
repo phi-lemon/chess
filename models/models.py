@@ -28,8 +28,8 @@ class Tournament:
         """
         self.name = name
         self.place = place
-        self.date_begin = datetime.strptime(date_begin, '%d-%m-%y %H:%M:%S').date()
-        self.date_end = datetime.strptime(date_end, '%d-%m-%y %H:%M:%S').date()
+        self.date_begin = date_begin
+        self.date_end = date_end
         self.nb_tours = nb_tours
         self.tournament_type = tournament_type
         self.description = description
@@ -50,7 +50,7 @@ class Player:
         self.tournament = tournament
         self.firstname = firstname
         self.lastname = lastname
-        self.birthdate = datetime.strptime(birthdate, '%d-%m-%y').date()
+        self.birthdate = birthdate
         self.sex = sex
         self.__rank = rank
         self.__score = 0
@@ -88,8 +88,8 @@ class Tour:
             raise RuntimeError("Too much tours for this tournament")
 
         self.name = name
-        self.date_begin = datetime.strptime(date_begin, '%d-%m-%y %H:%M:%S').date()  # todo à remplir automatiquement qd utilisateur crée le tour
-        self.date_end = datetime.strptime(date_end, '%d-%m-%y %H:%M:%S').date()  # todo à remplir automatiquement qd utilisateur marque tour comme terminé
+        self.date_begin = date_begin  # todo à remplir automatiquement qd utilisateur crée le tour
+        self.date_end = date_end  # todo à remplir automatiquement qd utilisateur marque tour comme terminé
 
         self.matches = {}
 
