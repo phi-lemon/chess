@@ -9,17 +9,24 @@ class View:
         tournament = dict()
         tournament['name'] = input("Name: ")
         tournament['place'] = input("Place: ")
-        try:
-            tournament['date_begin'] = vui("Begin date (dd-mm-yyyy hh:mm:ss) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
-            tournament['date_begin'] = datetime.strptime(tournament['date_begin'], '%d-%m-%Y %H:%M:%S')
-        except ValueError:
-            print("Incorrect date string")
-        try:
-            tournament['date_end'] = vui("End date (dd-mm-yyyy hh:mm:ss) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
-            tournament['date_end'] = datetime.strptime(tournament['date_end'], '%d-%m-%Y %H:%M:%S')
-        except ValueError:
-            print("Incorrect date string")
-        tournament['tournament_type'] = vui("Type ('Blitz', 'Bullet', 'Coup rapide'): ", range_=('Blitz', 'Bullet', 'Coup rapide'))
+        ask_date_begin, ask_date_end = 1, 1
+        while ask_date_begin == 1:
+            try:
+                tournament['date_begin'] = vui("Begin date (dd-mm-yyyy hh:mm:ss) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
+                tournament['date_begin'] = datetime.strptime(tournament['date_begin'], '%d-%m-%Y %H:%M:%S')
+                ask_date_begin = 0
+            except ValueError:
+                ask_date_begin = 1
+                print("Incorrect date")
+        while ask_date_end == 1:
+            try:
+                tournament['date_end'] = vui("End date (dd-mm-yyyy hh:mm:ss) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
+                tournament['date_end'] = datetime.strptime(tournament['date_end'], '%d-%m-%Y %H:%M:%S')
+                ask_date_end = 0
+            except ValueError:
+                ask_date_end = 1
+                print("Incorrect date")
+        tournament['tournament_type'] = vui("Type ('Blitz', 'Bullet', 'Coup rapide'): ", type_=str.lower, range_=('blitz', 'bullet', 'coup rapide'))
         tournament['description'] = input("Description: ")
         tournament['nb_tours'] = vui("Number of rounds: ", int, min_=1)
         return tournament
@@ -39,7 +46,7 @@ class View:
             player['birthdate'] = datetime.strptime(player['birthdate'], '%d-%m-%Y')
         except ValueError:
             print("Incorrect date string")
-        player['gender'] = vui("Gender (F/M/N): ", range_=('F', 'M', 'N'))
+        player['gender'] = vui("Gender (F/M/N): ", type_=str.lower, range_=('f', 'm', 'n'))
         player['rank'] = vui("Rank: ", type_=float, min_=0)
         return player
 
@@ -86,5 +93,6 @@ class View:
         print('\n')
 
 
+# todo ajouter le numéro de joueur lors de l'ajout
 # todo menu new tournament, add players (only before tournament is started), update ranks, reports
 
