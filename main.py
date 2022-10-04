@@ -1,12 +1,12 @@
 """Entry point."""
 
-from models import models
+from models.tournament import Tournament
 from controllers.base import Controller
 from views.base import View
 
 
 def main():
-    tournament = models.Tournament()
+    tournament = Tournament()
     view = View()
 
     # Create tournament

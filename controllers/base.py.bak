@@ -1,5 +1,5 @@
 """Define the main controller."""
-from models.tour import Tour
+from models import models
 from controllers.create_pairs import create_first_tour_pairs, create_tour_pairs
 
 
@@ -27,7 +27,7 @@ class Controller:
         :return:
         """
         t = self.view.prompt_for_tour()
-        tour = Tour(t['name'], t['date_begin'], t['date_end'], self.tournament)
+        tour = models.Tour(t['name'], t['date_begin'], t['date_end'], self.tournament)
         if len(self.tournament.tours) == 1:
             players_tour = create_first_tour_pairs(self.tournament.players)
         else:

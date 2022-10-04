@@ -39,22 +39,22 @@ class View:
         return nb_players
 
     @staticmethod
-    def prompt_for_player():
+    def prompt_for_player(player_id):
         player = dict()
-        player['firstname'] = input("Player lastname: ")
-        player['lastname'] = input("Player firstname: ")
+        player['lastname'] = input(f"Player {player_id} lastname: ")
+        player['firstname'] = input(f"Player {player_id} firstname: ")
         ask_birthdate = 1
         while ask_birthdate == 1:
             try:
-                player['birthdate'] = vui("Birthdate (dd-mm-yyyy) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4}')
+                player['birthdate'] = vui(f"Player {player_id} birthdate (dd-mm-yyyy) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4}')
                 # check if the date is correct
                 datetime.strptime(player['birthdate'], '%d-%m-%Y')
                 ask_birthdate = 0
             except ValueError:
                 print("Incorrect date string")
                 ask_birthdate = 1
-        player['gender'] = vui("Gender (F/M/N): ", type_=str.lower, range_=('f', 'm', 'n'))
-        player['rank'] = vui("Rank: ", type_=float, min_=0)
+        player['gender'] = vui(f"Player {player_id} gender (F/M/N): ", type_=str.lower, range_=('f', 'm', 'n'))
+        player['rank'] = vui(f"Player {player_id} rank: ", type_=float, min_=0)
         return player
 
     @staticmethod
@@ -76,13 +76,13 @@ class View:
         return tour
 
     @staticmethod
-    def prompt_for_scores(tour, match):
+    def prompt_for_scores(tour, match, id_player_1, id_player_2, name_player_1, name_player_2):
         print('Entrer les scores du tour ' + tour, 'match ' + str(match))
         scores = dict()
         check = 0
         while check != 1:
-            scores['player_1'] = vui("Score player 1 (0 / 0.5 / 1): ", type_=float, range_=(0, 0.5, 1))
-            scores['player_2'] = vui("Score player 2 (0 / 0.5 / 1): ", type_=float, range_=(0, 0.5, 1))
+            scores['player_1'] = vui(f"Score player 1: id {id_player_1} - name {name_player_1}: ", type_=float, range_=(0, 0.5, 1))
+            scores['player_2'] = vui(f"Score player 2: id {id_player_2} - name {name_player_2}: ", type_=float, range_=(0, 0.5, 1))
             check = scores['player_1'] + scores['player_2']
         return scores
 
@@ -90,8 +90,8 @@ class View:
     def print_matches(tour):
         print(f"Matches tour {tour.tour_id}")
         for v in tour.matches.values():
-            print(f"Scores match {v.match_id:<5} p{v.id_player_1}: {v.score_match_player_1:3} / "
-                  f"p{v.id_player_2}: {v.score_match_player_2:3}")
+            print(f"Scores match {v.match_id:<5} player id {v.id_player_1}: {v.score_match_player_1:3} / "
+                  f"player id {v.id_player_2}: {v.score_match_player_2:3}")
 
     @staticmethod
     def print_infos_players(players):
