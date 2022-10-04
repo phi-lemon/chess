@@ -13,7 +13,8 @@ class View:
         while ask_date_begin == 1:
             try:
                 tournament['date_begin'] = vui("Begin date (dd-mm-yyyy hh:mm:ss) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
-                tournament['date_begin'] = datetime.strptime(tournament['date_begin'], '%d-%m-%Y %H:%M:%S')
+                # check if the date is correct
+                datetime.strptime(tournament['date_begin'], '%d-%m-%Y %H:%M:%S')
                 ask_date_begin = 0
             except ValueError:
                 ask_date_begin = 1
@@ -21,7 +22,8 @@ class View:
         while ask_date_end == 1:
             try:
                 tournament['date_end'] = vui("End date (dd-mm-yyyy hh:mm:ss) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
-                tournament['date_end'] = datetime.strptime(tournament['date_end'], '%d-%m-%Y %H:%M:%S')
+                # check if the date is correct
+                datetime.strptime(tournament['date_end'], '%d-%m-%Y %H:%M:%S')
                 ask_date_end = 0
             except ValueError:
                 ask_date_end = 1
@@ -41,11 +43,16 @@ class View:
         player = dict()
         player['firstname'] = input("Player lastname: ")
         player['lastname'] = input("Player firstname: ")
-        try:
-            player['birthdate'] = vui("Birthdate (dd-mm-yyyy) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4}')
-            player['birthdate'] = datetime.strptime(player['birthdate'], '%d-%m-%Y')
-        except ValueError:
-            print("Incorrect date string")
+        ask_birthdate = 1
+        while ask_birthdate == 1:
+            try:
+                player['birthdate'] = vui("Birthdate (dd-mm-yyyy) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4}')
+                # check if the date is correct
+                datetime.strptime(player['birthdate'], '%d-%m-%Y')
+                ask_birthdate = 0
+            except ValueError:
+                print("Incorrect date string")
+                ask_birthdate = 1
         player['gender'] = vui("Gender (F/M/N): ", type_=str.lower, range_=('f', 'm', 'n'))
         player['rank'] = vui("Rank: ", type_=float, min_=0)
         return player
@@ -56,19 +63,21 @@ class View:
         tour['name'] = input("Tour name: ")
         try:
             tour['date_begin'] = vui("Begin date (dd-mm-yyyy hh:mm:ss) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
-            tour['date_begin'] = datetime.strptime(tour['date_begin'], '%d-%m-%Y %H:%M:%S')
+            # check if the date is correct
+            datetime.strptime(tour['date_begin'], '%d-%m-%Y %H:%M:%S')
         except ValueError:
             print("Incorrect date string")
         try:
             tour['date_end'] = vui("End date (dd-mm-yyyy hh:mm:ss) : ", type_=str, regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
-            tour['date_end'] = datetime.strptime(tour['date_end'], '%d-%m-%Y %H:%M:%S')
+            # check if the date is correct
+            datetime.strptime(tour['date_end'], '%d-%m-%Y %H:%M:%S')
         except ValueError:
             print("Incorrect date string")
         return tour
 
     @staticmethod
     def prompt_for_scores(tour, match):
-        print('scores du tour ' + tour, 'match ' + str(match))
+        print('Entrer les scores du tour ' + tour, 'match ' + str(match))
         scores = dict()
         check = 0
         while check != 1:

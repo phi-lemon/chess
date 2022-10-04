@@ -1,4 +1,28 @@
-from datetime import datetime
+from tinydb import TinyDB, where
+db = TinyDB('data.json', indent=4)
+
+table_tournaments = db.table("Tournaments")
+table_players = db.table("Players")
+table_tours = db.table("Tours")
+table_matches = db.table("Matches")
+
+
+class SaveToDb:
+
+    @staticmethod
+    def save(table, attr, *exclude_attr):
+        """
+        Serialize instance attributes in a dict and insert in db
+        :param table: table in which save data
+        :param attr: dict - ex. : vars(self)
+        :param exclude_attr: attributes not to be inserted (ex. instance object)
+        :return: None
+        """
+        if exclude_attr:
+            dict_from_attr = {k: v for k, v in attr.items() if k not in exclude_attr}
+        else:
+            dict_from_attr = {k: v for k, v in attr.items()}
+        table.insert(dict_from_attr)
 
 
 class Tournament:
@@ -36,8 +60,11 @@ class Tournament:
         self.players = {}
         self.tours = []
 
-    def add_player(self, player_id, firstname, lastname, birthdate, sex, rank):
-        self.players[player_id] = Player(player_id, firstname, lastname, birthdate, sex, rank, self)
+        # save instance attributes to db
+        SaveToDb.save(table_tournaments, vars(self))
+
+    def add_player(self, player_id, firstname, lastname, birthdate, gender, rank):
+        self.players[player_id] = Player(player_id, firstname, lastname, birthdate, gender, rank, self)
 
     def add_tour(self, tour):
         self.tours.append(tour)
@@ -45,15 +72,18 @@ class Tournament:
 
 class Player:
 
-    def __init__(self, player_id, firstname, lastname, birthdate, sex, rank, tournament):
+    def __init__(self, player_id, firstname, lastname, birthdate, gender, rank, tournament):
         self.player_id = player_id
         self.tournament = tournament
         self.firstname = firstname
         self.lastname = lastname
         self.birthdate = birthdate
-        self.sex = sex
+        self.gender = gender
         self.__rank = rank
         self.__score = 0
+
+        # save instance attributes to db, without tournament object
+        SaveToDb.save(table_players, vars(self), 'tournament')
 
     @property
     def rank(self):
@@ -75,6 +105,9 @@ class Player:
             raise ValueError("Score must be positive")
         self.__score = score
 
+        # update player score in db
+        table_players.update({'_Player__score': score}, where('player_id') == self.player_id)
+
 
 class Tour:
     tour_id = 0
@@ -93,7 +126,11 @@ class Tour:
 
         self.matches = {}
 
+        # add this tour to tournament's list of tours
         self.tournament.add_tour(self)
+
+        # save instance attributes to db, without tournament object
+        SaveToDb.save(table_tours, vars(self), 'tournament')
 
     def add_match(self, match_id, id_player_1, id_player_2):
         """
@@ -117,9 +154,40 @@ class Match:
         :param id_player_1:
         """
         self.tour = tour
+        self.tour_id = tour.tour_id
         self.match_id = match_id
         self.id_player_1 = id_player_1
-        self.score_match_player_1 = 0
+        self.__score_match_player_1 = 0
         self.id_player_2 = id_player_2
-        self.score_match_player_2 = 0
-        self.match = ([self.id_player_1, self.score_match_player_1], [self.id_player_2, self.score_match_player_2])
+        self.__score_match_player_2 = 0
+        # instanciate a match
+        self.match = ([self.id_player_1, self.__score_match_player_1], [self.id_player_2, self.__score_match_player_2])
+
+        # save instance attributes to db, without tour object
+        SaveToDb.save(table_matches, vars(self), 'tour', 'match')
+
+    @property
+    def score_match_player_1(self):
+        return self.__score_match_player_1
+
+    @score_match_player_1.setter
+    def score_match_player_1(self, score_match_player_1):
+        if score_match_player_1 < 0:
+            raise ValueError("Score must be positive")
+        self.__score_match_player_1 = score_match_player_1
+
+        # update player score in db
+        table_matches.update({'_Match__score_match_player_1': score_match_player_1}, where('match_id') == self.match_id)
+
+    @property
+    def score_match_player_2(self):
+        return self.__score_match_player_2
+
+    @score_match_player_2.setter
+    def score_match_player_2(self, score_match_player_2):
+        if score_match_player_2 < 0:
+            raise ValueError("Score must be positive")
+        self.__score_match_player_2 = score_match_player_2
+
+        # update player score in db
+        table_matches.update({'_Match__score_match_player_2': score_match_player_2}, where('match_id') == self.match_id)

@@ -1,6 +1,6 @@
 """Define the main controller."""
 from models import models
-from create_pairs import create_first_tour_pairs, create_tour_pairs
+from controllers.create_pairs import create_first_tour_pairs, create_tour_pairs
 
 
 class Controller:
