@@ -31,13 +31,12 @@ class Controller:
         if len(self.tournament.tours) == 1:
             players_tour = create_first_tour_pairs(self.tournament.players)
         else:
-            players_tour = create_tour_pairs(self.tournament.players)
+            players_tour = create_tour_pairs(self.tournament.players, self.tournament)
 
         self.create_matches(tour, players_tour)
         return tour
 
-    @staticmethod
-    def create_matches(tour, pairs_of_players):
+    def create_matches(self, tour, pairs_of_players):
         """
         Create matches and add them to current tour
         :param tour:
@@ -45,9 +44,11 @@ class Controller:
         :return:
         """
         match_id = 1
+        tournament_match_id = len(self.tournament.matches_players)
         for pairs in pairs_of_players:
+            tournament_match_id += 1
             id_player1, id_player2 = pairs
-            tour.add_match(match_id, id_player1, id_player2)
+            tour.add_match(match_id, id_player1, id_player2, tournament_match_id)
             match_id += 1
 
     def maj_scores(self, tour):
@@ -73,29 +74,60 @@ class Controller:
             self.tournament.players[id_player_1].score += score_match_player_1
             self.tournament.players[id_player_2].score += score_match_player_2
 
-        # Print infos match
-        self.view.print_matches(tour)
-
         # Print infos players
         self.view.print_infos_players(self.tournament.players)
 
+    # def add_players(self):
+        # nb_of_players = self.view.prompt_for_nb_of_players(self.tournament.name)
+        # for player_id in range(nb_of_players):
+        #     player_id = player_id + 1
+        #     p = self.view.prompt_for_player(player_id)
+        #     self.tournament.add_player(player_id,
+        #                                p['firstname'],
+        #                                p['lastname'],
+        #                                p['birthdate'],
+        #                                p['gender'],
+        #                                p['rank'])
     def add_players(self):
-        nb_of_players = self.view.prompt_for_nb_of_players()
-        for player_id in range(nb_of_players):
-            player_id = player_id + 1
-            p = self.view.prompt_for_player(player_id)
-            self.tournament.add_player(player_id,
+        players = [{'id': 1, 'firstname': 'Titi', 'lastname': 'Durand',
+                    'birthdate': '07-05-76', 'gender': 'M', 'rank': 20},
+                   {'id': 2, 'firstname': 'Mathilde', 'lastname': 'Dupont',
+                    'birthdate': '04-07-95', 'gender': 'F', 'rank': 29},
+                   {'id': 3, 'firstname': 'Gaston', 'lastname': 'Martin',
+                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 1},
+                   {'id': 4, 'firstname': 'George', 'lastname': 'Harisson',
+                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 55},
+                   {'id': 5, 'firstname': 'John', 'lastname': 'Lennon',
+                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 29},
+                   {'id': 6, 'firstname': 'Alphonse', 'lastname': 'Daudet',
+                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 34},
+                   {'id': 7, 'firstname': 'Ringo', 'lastname': 'Star',
+                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 76},
+                   {'id': 8, 'firstname': 'Dee Dee',
+                    'lastname': 'Bridgewater',
+                    'birthdate': '04-07-95', 'gender': 'F', 'rank': 10}]
+
+        for p in players:
+            self.tournament.add_player(p['id'],
                                        p['firstname'],
                                        p['lastname'],
                                        p['birthdate'],
                                        p['gender'],
                                        p['rank'])
 
-    def run(self):
-        # update instance of empty Tournament that has been created in __init__
-        self.create_tournament()
-        self.add_players()
+    def actions(self):
+        menu = self.view.menu()
+        while menu != 0:
+            if menu == 1:
+                self.create_tournament()
+            elif menu == 2:
+                self.add_players()
+            elif menu == 3:
+                for i in range(self.tournament.nb_tours):
+                    tour = self.create_tour_and_matches()
+                    self.maj_scores(tour)
 
-        for i in range(self.tournament.nb_tours):
-            tour = self.create_tour_and_matches()
-            self.maj_scores(tour)
+            menu = self.view.menu()
+
+    def run(self):
+        self.actions()

@@ -1,5 +1,5 @@
-from models.storage import SaveToDb
 from tinydb import where
+import models.db as db
 
 
 class Player:
@@ -15,7 +15,7 @@ class Player:
         self.__score = 0
 
         # save instance attributes to db, without tournament object
-        SaveToDb.save(SaveToDb.table_players, vars(self), 'tournament')
+        db.serialize(db.TABLE_PLAYERS, vars(self), 'tournament')
 
     @property
     def rank(self):
@@ -38,5 +38,5 @@ class Player:
         self.__score = score
 
         # update player score in db
-        SaveToDb.table_players.update({'_Player__score': score}, where('player_id') == self.player_id)
+        db.TABLE_PLAYERS.update({'_Player__score': score}, where('player_id') == self.player_id)
 

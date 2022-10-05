@@ -7,7 +7,7 @@ class View:
     @staticmethod
     def prompt_for_tournament():
         tournament = dict()
-        tournament['name'] = input("Name: ")
+        tournament['name'] = input("Tournament name: ")
         tournament['place'] = input("Place: ")
         ask_date_begin, ask_date_end = 1, 1
         while ask_date_begin == 1:
@@ -34,8 +34,8 @@ class View:
         return tournament
 
     @staticmethod
-    def prompt_for_nb_of_players():
-        nb_players = vui("Number of players: ", int, range_=(range(2, 1000, 2)))
+    def prompt_for_nb_of_players(tournament_name):
+        nb_players = vui(f"Number of players for tournament \"{tournament_name}\": ", int, range_=(range(2, 1000, 2)))
         return nb_players
 
     @staticmethod
@@ -101,7 +101,14 @@ class View:
             print(f"Id: {v.player_id:<2} | {v.firstname:>12} {v.lastname:12} | Score: {v.score:2}")
         print('\n')
 
+    @staticmethod
+    def menu():
+        print('[1] New tournament')
+        print('[2] Add players to current tournament')
+        print('[3] Create round')
+        print('[4] Update players rank')
+        print('[5] Display report')
+        print('[0] Exit')
 
-# todo ajouter le numéro de joueur lors de l'ajout
-# todo menu new tournament, add players (only before tournament is started), update ranks, reports
-
+        option = vui("Choose option: ", type_=float, range_=(range(0, 5)))
+        return option

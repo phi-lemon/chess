@@ -28,10 +28,11 @@ def create_first_tour_pairs(players):
 
 
 # Create pairs of players for tours > #1
-def create_tour_pairs(players):
+def create_tour_pairs(players, tournament):
     """
     Creates a list of players pairs
     :param players: list of all tournament players (can't be odd)
+    :param tournament: instance of tournament
     :return: list: [(,), (,), (,), (,)]
     """
     # Number of players must be even
@@ -47,7 +48,6 @@ def create_tour_pairs(players):
     # sort by rank if score is same
     players_sorted = []
     i = 0
-    # todo tuple unpacking
     while i < len(players_sorted_by_score):
         players_sorted.append(players_sorted_by_score[i])
         # compare scores
@@ -67,7 +67,18 @@ def create_tour_pairs(players):
     # Making pairs of players
     pairs_of_players = []
     for i in range(int(len(players_sorted) / 2)):
-        a, b = players_sorted.pop(), players_sorted.pop()
-        pairs_of_players.append((a, b))
+        # did players already had a match (compare sets)?
+        m = {players_sorted[-1], players_sorted[-2]}
+        if m not in tournament.matches_players:
+            a, b = players_sorted.pop(), players_sorted.pop()
+            pairs_of_players.append((a, b))
+        else:
+            # swap players
+            try:
+                players_sorted[-2], players_sorted[-3] = players_sorted[-3], players_sorted[-2]
+            except IndexError:
+                pass
+            a, b = players_sorted.pop(), players_sorted.pop()
+            pairs_of_players.append((a, b))
 
     return pairs_of_players

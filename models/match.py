@@ -1,9 +1,9 @@
-from models.storage import SaveToDb
 from tinydb import where
+import models.db as db
 
 
 class Match:
-    def __init__(self, match_id, tour, id_player_1, id_player_2):
+    def __init__(self, match_id, tour, id_player_1, id_player_2, tournament_match_id):
         """
         A match is a tuple containing 2 lists [player, score]
         :param match_id:
@@ -18,11 +18,10 @@ class Match:
         self.__score_match_player_1 = 0
         self.id_player_2 = id_player_2
         self.__score_match_player_2 = 0
-        # instanciate a match
-        self.match = ([self.id_player_1, self.__score_match_player_1], [self.id_player_2, self.__score_match_player_2])
+        self.tournament_match_id = tournament_match_id
 
         # save instance attributes to db, without tour object
-        SaveToDb.save(SaveToDb.table_matches, vars(self), 'tour', 'match')
+        db.serialize(db.TABLE_MATCHES, vars(self), 'tour')
 
     @property
     def score_match_player_1(self):
@@ -34,8 +33,10 @@ class Match:
             raise ValueError("Score must be positive")
         self.__score_match_player_1 = score_match_player_1
 
-        # update player score in db
-        SaveToDb.table_matches.update({'_Match__score_match_player_1': score_match_player_1}, where('match_id') == self.match_id)
+        # update match score in db
+        db.TABLE_MATCHES.update(
+            {'_Match__score_match_player_1': score_match_player_1},
+            where('tournament_match_id') == self.tournament_match_id)
 
     @property
     def score_match_player_2(self):
@@ -47,5 +48,7 @@ class Match:
             raise ValueError("Score must be positive")
         self.__score_match_player_2 = score_match_player_2
 
-        # update player score in db
-        SaveToDb.table_matches.update({'_Match__score_match_player_2': score_match_player_2}, where('match_id') == self.match_id)
+        # update match score in db
+        db.TABLE_MATCHES.update(
+            {'_Match__score_match_player_2': score_match_player_2},
+            where('tournament_match_id') == self.tournament_match_id)

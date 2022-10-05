@@ -1,4 +1,4 @@
-from models.storage import SaveToDb
+import models.db as db
 from models.match import Match
 
 
@@ -23,15 +23,23 @@ class Tour:
         self.tournament.add_tour(self)
 
         # save instance attributes to db, without tournament object
-        SaveToDb.save(SaveToDb.table_tours, vars(self), 'tournament')
+        db.serialize(db.TABLE_TOURS, vars(self), 'tournament')
 
-    def add_match(self, match_id, id_player_1, id_player_2):
+    def add_match(self, match_id, id_player_1, id_player_2, tournament_match_id):
         """
         Creates a match and add it to tour's matches dict
-        This method is called from the controller
-        :param match_id:
+        Method called from the controller
+        :param match_id: match identifier for the round
         :param id_player_1:
         :param id_player_2:
+        :param tournament_match_id: unique match identifier for the tournament
         :return:
         """
-        self.matches[match_id] = Match(match_id, self, id_player_1, id_player_2)
+        self.matches[match_id] = Match(match_id, self, id_player_1, id_player_2, tournament_match_id)
+
+        # append pair of players (set) to tournament
+        self.tournament.matches_players.append({id_player_1, id_player_2})
+        # db.TABLE_TOURNAMENTS.update({'matches_players':  self.tournament.matches_players})
+
+
+

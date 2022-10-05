@@ -1,4 +1,4 @@
-from models.storage import SaveToDb
+import models.db as db
 from models.player import Player
 
 
@@ -16,6 +16,7 @@ class Tournament:
         self.description = None
         self.players = {}
         self.tours = []
+        self.matches_players = []
 
     def add_tournament_infos(self, name, place, date_begin, date_end, tournament_type, description, nb_tours=4):
         """
@@ -38,10 +39,14 @@ class Tournament:
         self.tours = []
 
         # save instance attributes to db
-        SaveToDb.save(SaveToDb.table_tournaments, vars(self))
+        db.serialize(db.TABLE_TOURNAMENTS, vars(self))
 
     def add_player(self, player_id, firstname, lastname, birthdate, gender, rank):
         self.players[player_id] = Player(player_id, firstname, lastname, birthdate, gender, rank, self)
+        # todo add to tournament players in db
 
     def add_tour(self, tour):
         self.tours.append(tour)
+        # todo add to tournament tours in db
+
+
