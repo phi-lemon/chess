@@ -1,4 +1,6 @@
 """Define the main controller."""
+from tinydb import where
+import models.db as db
 from models.tour import Tour
 from controllers.create_pairs import create_first_tour_pairs, create_tour_pairs
 
@@ -10,11 +12,10 @@ class Controller:
 
     def create_tournament(self):
         tournament_params = self.view.prompt_for_tournament()
-        self.tournament.add_tournament_infos(
+        self.tournament.add_tournament(
             tournament_params['name'],
             tournament_params['place'],
             tournament_params['date_begin'],
-            tournament_params['date_end'],
             tournament_params['tournament_type'],
             tournament_params['description'],
             tournament_params['nb_tours']
@@ -26,8 +27,10 @@ class Controller:
         For the first tour, player pairing is different
         :return:
         """
+        tour = Tour()
         t = self.view.prompt_for_tour()
-        tour = Tour(t['name'], t['date_begin'], t['date_end'], self.tournament)
+        tour.add_tour(t['date_begin'], None, self.tournament)
+        self.view.print_message(f"Tour {tour.tour_id} created\n")
         if len(self.tournament.tours) == 1:
             players_tour = create_first_tour_pairs(self.tournament.players)
         else:
@@ -58,7 +61,7 @@ class Controller:
             name_player_1 = tour.tournament.players[id_player_1].lastname
             name_player_2 = tour.tournament.players[id_player_2].lastname
             s = self.view.prompt_for_scores(
-                tour.name,
+                tour.tour_id,
                 tour.matches[i + 1].match_id,
                 id_player_1,
                 id_player_2,
@@ -74,8 +77,17 @@ class Controller:
             self.tournament.players[id_player_1].score += score_match_player_1
             self.tournament.players[id_player_2].score += score_match_player_2
 
+        # End of round
+        date_end = self.view.prompt_for_end_date('Tour')
+        tour.stop(date_end)
+
         # Print infos players
         self.view.print_infos_players(self.tournament.players)
+        # End of tournament
+        if len(self.tournament.tours) == self.tournament.nb_tours:
+            date_end = self.view.prompt_for_end_date('Tournament')
+            self.tournament.stop(date_end)
+
 
     # def add_players(self):
         # nb_of_players = self.view.prompt_for_nb_of_players(self.tournament.name)
@@ -123,9 +135,20 @@ class Controller:
             elif menu == 2:
                 self.add_players()
             elif menu == 3:
-                for i in range(self.tournament.nb_tours):
-                    tour = self.create_tour_and_matches()
-                    self.maj_scores(tour)
+                for tour in self.tournament.tours:
+                    self.view.print_tour(tour)
+                if len(self.tournament.tours) == 0:
+                    self.create_tour_and_matches()
+                else:
+                    last_tour = self.tournament.tours[-1]
+                    # for tour in reversed(self.tournament.tours):
+                    if last_tour.is_active_tour():
+                        if self.view.prompt_update_scores():
+                            self.maj_scores(last_tour)
+                            # break
+                    else:
+                        if len(self.tournament.tours) < self.tournament.nb_tours:
+                            self.create_tour_and_matches()
 
             menu = self.view.menu()
 
