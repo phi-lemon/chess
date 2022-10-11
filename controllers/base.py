@@ -1,7 +1,6 @@
-"""Define the main controller."""
-from tinydb import where
-import models.db as db
+"""Main controller."""
 from models.tour import Tour
+from models.player import Player
 from controllers.create_pairs import create_first_tour_pairs, create_tour_pairs
 
 
@@ -55,6 +54,7 @@ class Controller:
             match_id += 1
 
     def maj_scores(self, tour):
+        # tour.matches is a dict but stored in db as a list
         for i in range(len(tour.matches)):
             id_player_1 = tour.matches[i+1].id_player_1
             id_player_2 = tour.matches[i+1].id_player_2
@@ -84,22 +84,22 @@ class Controller:
         # Print infos players
         self.view.print_infos_players(self.tournament.players)
         # End of tournament
-        if len(self.tournament.tours) == self.tournament.nb_tours:
+        if len(self.tournament.table_tours) == self.tournament.nb_tours:
             date_end = self.view.prompt_for_end_date('Tournament')
             self.tournament.stop(date_end)
 
-
     # def add_players(self):
-        # nb_of_players = self.view.prompt_for_nb_of_players(self.tournament.name)
-        # for player_id in range(nb_of_players):
-        #     player_id = player_id + 1
-        #     p = self.view.prompt_for_player(player_id)
-        #     self.tournament.add_player(player_id,
-        #                                p['firstname'],
-        #                                p['lastname'],
-        #                                p['birthdate'],
-        #                                p['gender'],
-        #                                p['rank'])
+    #     # get nb of players already registered
+    #     nb_players = Player.get_players_nb(self.tournament)
+    #     player_id = nb_players + 1
+    #     p = self.view.prompt_for_player(player_id)
+    #     self.tournament.add_player(player_id,
+    #                                p['firstname'],
+    #                                p['lastname'],
+    #                                p['birthdate'],
+    #                                p['gender'],
+    #                                p['rank'])
+
     def add_players(self):
         players = [{'id': 1, 'firstname': 'Titi', 'lastname': 'Durand',
                     'birthdate': '07-05-76', 'gender': 'M', 'rank': 20},
@@ -115,8 +115,7 @@ class Controller:
                     'birthdate': '04-07-95', 'gender': 'M', 'rank': 34},
                    {'id': 7, 'firstname': 'Ringo', 'lastname': 'Star',
                     'birthdate': '04-07-95', 'gender': 'M', 'rank': 76},
-                   {'id': 8, 'firstname': 'Dee Dee',
-                    'lastname': 'Bridgewater',
+                   {'id': 8, 'firstname': 'Dee Dee', 'lastname': 'Bridgewater',
                     'birthdate': '04-07-95', 'gender': 'F', 'rank': 10}]
 
         for p in players:
@@ -131,24 +130,51 @@ class Controller:
         menu = self.view.menu()
         while menu != 0:
             if menu == 1:
-                self.create_tournament()
-            elif menu == 2:
-                self.add_players()
-            elif menu == 3:
-                for tour in self.tournament.tours:
-                    self.view.print_tour(tour)
-                if len(self.tournament.tours) == 0:
-                    self.create_tour_and_matches()
+                # Create tournament
+                # Is there an active tournament?
+                if self.tournament.deserialize_active_tournament():
+                    self.view.print_message("A tournament is already active.")
                 else:
-                    last_tour = self.tournament.tours[-1]
-                    # for tour in reversed(self.tournament.tours):
-                    if last_tour.is_active_tour():
-                        if self.view.prompt_update_scores():
-                            self.maj_scores(last_tour)
-                            # break
+                    self.create_tournament()
+            elif menu == 2:
+                # do not add players if a round is already created
+                # todo create function
+                if len(self.tournament.table_tours) > 0:
+                    self.view.print_message(
+                        "You can't add player after a round has been created")
+                # add players to an active tournament
+                elif self.tournament.deserialize_active_tournament():
+                    self.add_players()
+                else:
+                    self.view.print_message("Create a tournament is required before adding players.")
+            elif menu == 3:
+                # Create round or update score
+                # Need players
+                if Player.get_players_nb(self.tournament) == 0:
+                    self.view.print_message("Please add players first.")
+                # Need even number of players
+                elif Player.get_players_nb(self.tournament) % 2 != 0:
+                    self.view.print_message(
+                        "Number of player must be even. Add a player.")
+                else:
+                    # Deserialize tournament, players and tours
+                    self.tournament.deserialize_active_tournament()
+                    self.tournament.deserialize_players()
+                    for serialized_tour in self.tournament.table_tours:
+                        tour = self.tournament.deserialize_tour(serialized_tour)
+                        self.view.print_tour(tour)
+                    if len(self.tournament.tours) == 0:
+                        self.create_tour_and_matches()
                     else:
-                        if len(self.tournament.tours) < self.tournament.nb_tours:
-                            self.create_tour_and_matches()
+                        last_tour = self.tournament.tours[-1]
+                        if last_tour.is_active_tour():
+                            if self.view.prompt_update_scores():
+                                last_tour.deserialize_matches()
+                                self.maj_scores(last_tour)
+                        else:
+                            # if len(self.tournament.tours) < self.tournament.nb_tours:
+                            if len(self.tournament.table_tours) < self.tournament.nb_tours:
+                                self.create_tour_and_matches()
 
             menu = self.view.menu()
 

@@ -1,10 +1,11 @@
 from tinydb import where
-import models.db as db
+# import models.db as db
+from models.serialize import serialize
 
 
 class Player:
 
-    def __init__(self, player_id, firstname, lastname, birthdate, gender, rank, tournament):
+    def __init__(self, player_id, firstname, lastname, birthdate, gender, rank, tournament, score=0):
         self.player_id = player_id
         self.tournament = tournament
         self.firstname = firstname
@@ -12,10 +13,7 @@ class Player:
         self.birthdate = birthdate
         self.gender = gender
         self.__rank = rank
-        self.__score = 0
-
-        # save instance attributes to db, without tournament object
-        db.serialize(db.TABLE_PLAYERS, vars(self), 'tournament')
+        self.__score = score
 
     @property
     def rank(self):
@@ -38,5 +36,12 @@ class Player:
         self.__score = score
 
         # update player score in db
-        db.TABLE_PLAYERS.update({'_Player__score': score}, where('player_id') == self.player_id)
+        self.tournament.table_players.update({'_Player__score': score}, where('player_id') == self.player_id)
+
+    @staticmethod
+    def get_players_nb(tournament):
+        if tournament.table_players:
+            return len(tournament.table_players)
+        else:
+            return 0
 

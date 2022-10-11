@@ -1,5 +1,6 @@
 from tinydb import where
-import models.db as db
+# import models.db as db
+from models.serialize import serialize
 
 
 class Match:
@@ -20,9 +21,6 @@ class Match:
         self.__score_match_player_2 = 0
         self.tournament_match_id = tournament_match_id
 
-        # save instance attributes to db, without tour object
-        db.serialize(db.TABLE_MATCHES, vars(self), 'tour')
-
     @property
     def score_match_player_1(self):
         return self.__score_match_player_1
@@ -34,7 +32,7 @@ class Match:
         self.__score_match_player_1 = score_match_player_1
 
         # update match score in db
-        db.TABLE_MATCHES.update(
+        self.tour.tournament.table_matches.update(
             {'_Match__score_match_player_1': score_match_player_1},
             where('tournament_match_id') == self.tournament_match_id)
 
@@ -49,6 +47,6 @@ class Match:
         self.__score_match_player_2 = score_match_player_2
 
         # update match score in db
-        db.TABLE_MATCHES.update(
+        self.tour.tournament.table_matches.update(
             {'_Match__score_match_player_2': score_match_player_2},
             where('tournament_match_id') == self.tournament_match_id)

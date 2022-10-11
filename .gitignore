@@ -2,8 +2,7 @@
 backup/
 
 # data
-models/data.json
-data.json
+data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

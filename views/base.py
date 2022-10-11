@@ -24,10 +24,10 @@ class View:
         tournament['nb_tours'] = vui("Number of rounds: ", int, min_=1)
         return tournament
 
-    @staticmethod
-    def prompt_for_nb_of_players(tournament_name):
-        nb_players = vui(f"Number of players for tournament \"{tournament_name}\": ", int, range_=(range(2, 1000, 2)))
-        return nb_players
+    # @staticmethod
+    # def prompt_for_nb_of_players(tournament_name):
+    #     nb_players = vui(f"Number of players for tournament \"{tournament_name}\": ", int, range_=(range(2, 1000, 2)))
+    #     return nb_players
 
     @staticmethod
     def prompt_for_player(player_id):

@@ -1,12 +1,3 @@
-from tinydb import TinyDB
-
-tdb = TinyDB('data/data.json', indent=4)
-TABLE_TOURNAMENTS = tdb.table("Tournaments")
-TABLE_PLAYERS = tdb.table("Players")
-TABLE_TOURS = tdb.table("Tours")
-TABLE_MATCHES = tdb.table("Matches")
-
-
 def serialize(table, attr, *exclude_attr):
     """
     Serialize instance attributes in a dict and insert in db
