@@ -1,9 +1,8 @@
-from tinydb import where
-# import models.db as db
-from models.serialize import serialize
+from tinydb import TinyDB, where, Query
 
 
 class Player:
+    PLAYERS_LIST = TinyDB('data/players_list.json', indent=4)
 
     def __init__(self, player_id, firstname, lastname, birthdate, gender, rank, tournament, score=0):
         self.player_id = player_id
@@ -14,6 +13,7 @@ class Player:
         self.gender = gender
         self.__rank = rank
         self.__score = score
+        self.__uid = len(Player.PLAYERS_LIST) + 1
 
     @property
     def rank(self):
@@ -45,3 +45,18 @@ class Player:
         else:
             return 0
 
+    @staticmethod
+    def get_total_players_nb():
+        if Player.PLAYERS_LIST:
+            return len(Player.PLAYERS_LIST)
+        else:
+            return 0
+
+    @staticmethod
+    def set_rank(player_uid, player_rank):
+        q = Query()
+        if Player.PLAYERS_LIST.get(q._Player__uid == player_uid):
+            Player.PLAYERS_LIST.update({'_Player__rank': player_rank}, where('_Player__uid') == player_uid)
+            return True
+        else:
+            return False

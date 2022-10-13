@@ -112,12 +112,23 @@ class View:
         print('\n')
 
     @staticmethod
+    def prompt_for_player_uid():
+        player_uid = vui("Enter player uid: ", type_=int, min_=1)
+        return player_uid
+
+    @staticmethod
+    def prompt_for_player_rank(player_uid):
+        player_rank = vui(f"Player {player_uid} rank: ", type_=float, min_=0)
+        return player_rank
+
+    @staticmethod
     def menu():
+        print()
         print('[1] Create tournament')
         print('[2] Add player to current tournament')
         print('[3] Create round / update scores')
         print('[4] Update players rank')
-        print('[5] Display report')
+        print('[5] Display reports')
         print('[0] Exit')
 
         option = vui("Choose option: ", type_=float, range_=(range(0, 5)))

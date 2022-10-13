@@ -88,43 +88,17 @@ class Controller:
             date_end = self.view.prompt_for_end_date('Tournament')
             self.tournament.stop(date_end)
 
-    # def add_players(self):
-    #     # get nb of players already registered
-    #     nb_players = Player.get_players_nb(self.tournament)
-    #     player_id = nb_players + 1
-    #     p = self.view.prompt_for_player(player_id)
-    #     self.tournament.add_player(player_id,
-    #                                p['firstname'],
-    #                                p['lastname'],
-    #                                p['birthdate'],
-    #                                p['gender'],
-    #                                p['rank'])
-
     def add_players(self):
-        players = [{'id': 1, 'firstname': 'Titi', 'lastname': 'Durand',
-                    'birthdate': '07-05-76', 'gender': 'M', 'rank': 20},
-                   {'id': 2, 'firstname': 'Mathilde', 'lastname': 'Dupont',
-                    'birthdate': '04-07-95', 'gender': 'F', 'rank': 29},
-                   {'id': 3, 'firstname': 'Gaston', 'lastname': 'Martin',
-                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 1},
-                   {'id': 4, 'firstname': 'George', 'lastname': 'Harisson',
-                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 55},
-                   {'id': 5, 'firstname': 'John', 'lastname': 'Lennon',
-                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 29},
-                   {'id': 6, 'firstname': 'Alphonse', 'lastname': 'Daudet',
-                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 34},
-                   {'id': 7, 'firstname': 'Ringo', 'lastname': 'Star',
-                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 76},
-                   {'id': 8, 'firstname': 'Dee Dee', 'lastname': 'Bridgewater',
-                    'birthdate': '04-07-95', 'gender': 'F', 'rank': 10}]
-
-        for p in players:
-            self.tournament.add_player(p['id'],
-                                       p['firstname'],
-                                       p['lastname'],
-                                       p['birthdate'],
-                                       p['gender'],
-                                       p['rank'])
+        # get nb of players already registered
+        nb_players = Player.get_players_nb(self.tournament)
+        player_id = nb_players + 1
+        p = self.view.prompt_for_player(player_id)
+        self.tournament.add_player(player_id,
+                                   p['firstname'],
+                                   p['lastname'],
+                                   p['birthdate'],
+                                   p['gender'],
+                                   p['rank'])
 
     def actions(self):
         menu = self.view.menu()
@@ -155,7 +129,7 @@ class Controller:
                 # Need even number of players
                 elif Player.get_players_nb(self.tournament) % 2 != 0:
                     self.view.print_message(
-                        "Number of player must be even. Add a player.")
+                        "Number of player must be even. You must add a player.")
                 else:
                     # Deserialize tournament, players and tours
                     if not self.tournament.name:
@@ -176,6 +150,23 @@ class Controller:
                             # if len(self.tournament.tours) < self.tournament.nb_tours:
                             if len(self.tournament.table_tours) < self.tournament.nb_tours:
                                 self.create_tour_and_matches()
+            elif menu == 4:
+                # update player rank in players list
+                if Player.get_total_players_nb() == 0:
+                    self.view.print_message("Please add players first.")
+                # Update rank is not possible when a tournament is active
+                elif self.tournament.is_active_tournament():
+                    self.view.print_message(
+                        "Update rank is not possible during tournament.")
+                else:
+                    player_uid = self.view.prompt_for_player_uid()
+                    player_rank = self.view.prompt_for_player_rank(player_uid)
+                    if Player.set_rank(player_uid, player_rank):
+                        self.view.print_message(
+                            "Player rank succesfully updated.")
+                    else:
+                        self.view.print_message(
+                            "A problem occured. Please check player uid")
 
             menu = self.view.menu()
 

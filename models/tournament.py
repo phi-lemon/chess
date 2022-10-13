@@ -84,8 +84,10 @@ class Tournament:
 
     def add_player(self, player_id, firstname, lastname, birthdate, gender, rank):
         self.players[player_id] = Player(player_id, firstname, lastname, birthdate, gender, rank, self)
-        # save instance attributes to db
-        serialize(self.table_players, vars(self.players[player_id]), 'tournament')
+        # save instance attributes to tournament db
+        serialize(self.table_players, vars(self.players[player_id]), 'tournament', 'player_uid')
+        # save instance attributes to players db
+        serialize(Player.PLAYERS_LIST, vars(self.players[player_id]), 'player_id', 'tournament', 'score')
 
     def add_tour(self, tour):
         """
@@ -143,4 +145,8 @@ class Tournament:
         tour = Tour(tour_id, self, date_begin, date_end, active)
         self.tours.append(Tour(tour_id, self, date_begin, date_end, active))
         return tour
+
+    @staticmethod
+    def is_active_tournament():
+        return True if Tournament.TRN_LIST.search(where('active') == 1) else False
 
