@@ -7,7 +7,7 @@ from models.serialize import serialize
 class Tournament:
     TRN_LIST = TinyDB('data/tournaments_list.json', indent=4)
 
-    def __init__(self, name=None, place=None, date_begin=None, date_end=None, nb_tours=4, tournament_type=None, description=None, active=0):
+    def __init__(self, name=None, place=None, date_begin=None, date_end=None, nb_tours=None, tournament_type=None, description=None, active=0):
         """
         Intialize tournament with empty values. Use add_tournament to update instance
         """

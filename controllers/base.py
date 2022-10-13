@@ -158,7 +158,8 @@ class Controller:
                         "Number of player must be even. Add a player.")
                 else:
                     # Deserialize tournament, players and tours
-                    self.tournament.deserialize_active_tournament()
+                    if not self.tournament.name:
+                        self.tournament = self.tournament.deserialize_active_tournament()
                     self.tournament.deserialize_players()
                     for serialized_tour in self.tournament.table_tours:
                         tour = self.tournament.deserialize_tour(serialized_tour)
