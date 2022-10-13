@@ -6,7 +6,8 @@ from models.serialize import serialize
 class Tour:
     tour_id = 0
 
-    def __init__(self, tour_id=0, tournament=None, date_begin=None, date_end=None, active=0):
+    def __init__(self, tour_id=0, tournament=None, date_begin=None,
+                 date_end=None, active=0):
         self.tournament = tournament
         self.tour_id = tour_id
         self.date_begin = date_begin
@@ -50,25 +51,30 @@ class Tour:
     def matches_to_list(item):
         return [i for i in item]
 
-    def add_match(self, match_id, id_player_1, id_player_2, tournament_match_id):
+    def add_match(self, match_id, id_player_1, id_player_2,
+                  tournament_match_id):
         """
         Creates a match and add it to tour's matches dict
         Method called from the controller
         :param match_id: match identifier for the round
         :param id_player_1:
         :param id_player_2:
-        :param tournament_match_id: unique match identifier for the tournament
+        :param tournament_match_id: unique match identifier
+        for the tournament
         :return:
         """
-        self.matches[match_id] = Match(match_id, self, id_player_1, id_player_2, tournament_match_id)
+        self.matches[match_id] = Match(match_id, self, id_player_1,
+                                       id_player_2, tournament_match_id)
 
         # append pair of players (set) to tournament
         self.tournament.matches_players.append({id_player_1, id_player_2})
 
         # save instance attributes to db, without tour object
-        serialize(self.tournament.table_matches, vars(self.matches[match_id]), 'tour')
+        serialize(self.tournament.table_matches, vars(self.matches[match_id]),
+                  'tour')
         # update tour matches
-        self.tournament.table_tours.update({'matches': self.matches_to_list(self.matches)})
+        self.tournament.table_tours.update(
+            {'matches': self.matches_to_list(self.matches)})
 
     def deserialize_matches(self):
         """
@@ -80,9 +86,7 @@ class Tour:
             id_player_1 = m['id_player_1']
             id_player_2 = m['id_player_2']
             tournament_match_id = m['tournament_match_id']
-            Match(match_id, self, id_player_1, id_player_2, tournament_match_id)
-            self.matches[match_id] = Match(match_id, self, id_player_1, id_player_2, tournament_match_id)
-            # return match
-
-
-
+            Match(match_id, self, id_player_1, id_player_2,
+                  tournament_match_id)
+            self.matches[match_id] = Match(match_id, self, id_player_1,
+                                           id_player_2, tournament_match_id)

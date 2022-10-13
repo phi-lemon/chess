@@ -4,7 +4,8 @@ from tinydb import TinyDB, where, Query
 class Player:
     PLAYERS_LIST = TinyDB('data/players_list.json', indent=4)
 
-    def __init__(self, player_id, firstname, lastname, birthdate, gender, rank, tournament, score=0):
+    def __init__(self, player_id, firstname, lastname, birthdate, gender, rank,
+                 tournament, score=0):
         self.player_id = player_id
         self.tournament = tournament
         self.firstname = firstname
@@ -36,7 +37,8 @@ class Player:
         self.__score = score
 
         # update player score in db
-        self.tournament.table_players.update({'_Player__score': score}, where('player_id') == self.player_id)
+        self.tournament.table_players.update(
+            {'_Player__score': score}, where('player_id') == self.player_id)
 
     @staticmethod
     def get_players_nb(tournament):
@@ -56,7 +58,15 @@ class Player:
     def set_rank(player_uid, player_rank):
         q = Query()
         if Player.PLAYERS_LIST.get(q._Player__uid == player_uid):
-            Player.PLAYERS_LIST.update({'_Player__rank': player_rank}, where('_Player__uid') == player_uid)
+            Player.PLAYERS_LIST.update(
+                {'_Player__rank': player_rank},
+                where('_Player__uid') == player_uid)
             return True
         else:
             return False
+
+    @classmethod
+    def load_players(cls):
+        players = cls.PLAYERS_LIST.all()
+        return players
+

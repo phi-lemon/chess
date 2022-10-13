@@ -1,10 +1,9 @@
 from tinydb import where
-# import models.db as db
-from models.serialize import serialize
 
 
 class Match:
-    def __init__(self, match_id, tour, id_player_1, id_player_2, tournament_match_id):
+    def __init__(self, match_id, tour, id_player_1, id_player_2,
+                 tournament_match_id):
         """
         A match is a tuple containing 2 lists [player, score]
         :param match_id:

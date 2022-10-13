@@ -53,7 +53,8 @@ def create_tour_pairs(players, tournament):
         # compare scores
         if players_sorted_by_score[i][1] == players_sorted_by_score[i - 1][1]:
             # compare ranks
-            if players_sorted_by_score[i][2] < players_sorted_by_score[i - 1][2]:
+            if (players_sorted_by_score[i][2]
+                    < players_sorted_by_score[i - 1][2]):
                 players_sorted.insert(
                     i - 1,
                     players_sorted_by_score[i]
@@ -75,7 +76,8 @@ def create_tour_pairs(players, tournament):
         else:
             # swap players
             try:
-                players_sorted[-2], players_sorted[-3] = players_sorted[-3], players_sorted[-2]
+                players_sorted[-2], players_sorted[-3] = \
+                    players_sorted[-3], players_sorted[-2]
             except IndexError:
                 pass
             a, b = players_sorted.pop(), players_sorted.pop()

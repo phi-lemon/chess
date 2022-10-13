@@ -7,9 +7,12 @@ from models.serialize import serialize
 class Tournament:
     TRN_LIST = TinyDB('data/tournaments_list.json', indent=4)
 
-    def __init__(self, name=None, place=None, date_begin=None, date_end=None, nb_tours=None, tournament_type=None, description=None, active=0):
+    def __init__(self, name=None, place=None, date_begin=None, date_end=None,
+                 nb_tours=None, tournament_type=None, description=None,
+                 active=0):
         """
-        Intialize tournament with empty values. Use add_tournament to update instance
+        Intialize tournament with empty values.
+        Use add_tournament to update instance
         """
         self.name = name
         self.place = place
@@ -39,7 +42,8 @@ class Tournament:
         else:
             return 1 if len(cls.TRN_LIST) == 0 else len(cls.TRN_LIST)
 
-    def add_tournament(self, name, place, date_begin, tournament_type, description, nb_tours=4):
+    def add_tournament(self, name, place, date_begin, tournament_type,
+                       description, nb_tours=4):
         """
         Only one tournament may be active at a given time
         :param name:
@@ -59,17 +63,16 @@ class Tournament:
         self.tours = []
         self.active = 1
 
-        # self.tdb = TinyDB(
-        #     'data/' + str(self.get_current_tournament_id() + 1) + '.json',
-        #     indent=4)
-
         # add the tournament to tournaments_list db
         if Tournament.deserialize_active_tournament(self):
             raise RuntimeError("A tournament is already active")
         else:
             Tournament.TRN_LIST.insert({'active': 1})
+
             # save instance attributes (except db attributes)
-            serialize(self.table_tournaments, vars(self), 'tdb', 'table_tournaments', 'table_players', 'table_tours', 'table_matches')
+            serialize(self.table_tournaments, vars(self), 'tdb',
+                      'table_tournaments', 'table_players', 'table_tours',
+                      'table_matches')
 
     def stop(self, date_end):
         self.active = 0
@@ -82,12 +85,16 @@ class Tournament:
         # exit before create another tournament
         exit("End of tournament")
 
-    def add_player(self, player_id, firstname, lastname, birthdate, gender, rank):
-        self.players[player_id] = Player(player_id, firstname, lastname, birthdate, gender, rank, self)
+    def add_player(self, player_id, firstname, lastname, birthdate, gender,
+                   rank):
+        self.players[player_id] = Player(player_id, firstname, lastname,
+                                         birthdate, gender, rank, self)
         # save instance attributes to tournament db
-        serialize(self.table_players, vars(self.players[player_id]), 'tournament', 'player_uid')
+        serialize(self.table_players, vars(self.players[player_id]),
+                  'tournament', 'player_uid')
         # save instance attributes to players db
-        serialize(Player.PLAYERS_LIST, vars(self.players[player_id]), 'player_id', 'tournament', 'score')
+        serialize(Player.PLAYERS_LIST, vars(self.players[player_id]),
+                  'player_id', 'tournament', 'score')
 
     def add_tour(self, tour):
         """
@@ -95,8 +102,7 @@ class Tournament:
         :param tour:
         :return:
         """
-        self.tours.append(tour)
-        # todo add to tournament tours in db
+        self.tours.append(tour)  # todo add to tournament tours in db
 
     def deserialize_active_tournament(self):
         """
@@ -120,7 +126,8 @@ class Tournament:
                 tournament_type = serialized_tournament['tournament_type']
                 description = serialized_tournament['description']
                 active = serialized_tournament['active']
-                return Tournament(name, place, date_begin, date_end, nb_tours, tournament_type, description, active)
+                return Tournament(name, place, date_begin, date_end, nb_tours,
+                                  tournament_type, description, active)
         else:
             return False
 
@@ -133,9 +140,12 @@ class Tournament:
             gender = p['gender']
             rank = p['_Player__rank']
             score = p['_Player__score']
-            Player(player_id, firstname, lastname, birthdate, gender, rank, self, score)
+            Player(player_id, firstname, lastname, birthdate, gender, rank,
+                   self, score)
             # Add players to tournament instance
-            self.players[player_id] = Player(player_id, firstname, lastname, birthdate, gender, rank, self, score)
+            self.players[player_id] = Player(player_id, firstname, lastname,
+                                             birthdate, gender, rank, self,
+                                             score)
 
     def deserialize_tour(self, serialized_tour):
         tour_id = serialized_tour['tour_id']
@@ -148,5 +158,19 @@ class Tournament:
 
     @staticmethod
     def is_active_tournament():
-        return True if Tournament.TRN_LIST.search(where('active') == 1) else False
+        return True if Tournament.TRN_LIST.search(
+            where('active') == 1) else False
 
+    @staticmethod
+    def load_tournament_players(tournament_id):
+        db = TinyDB('data/' + str(tournament_id) + '.json')
+        players = db.table("Players").all()
+        return players
+
+    @classmethod
+    def load_tournaments(cls):
+        tournaments = []
+        for i in range(len(cls.TRN_LIST)):
+            db = TinyDB('data/' + str(i + 1) + '.json')
+            tournaments.append(db.table("Tournaments").all())
+        return tournaments
