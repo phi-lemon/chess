@@ -1,6 +1,7 @@
+from tinydb import TinyDB, where, Query
+from pathlib import Path
 from models.player import Player
 from models.tour import Tour
-from tinydb import TinyDB, where, Query
 from models.serialize import serialize
 
 
@@ -160,6 +161,12 @@ class Tournament:
     def is_active_tournament():
         return True if Tournament.TRN_LIST.search(
             where('active') == 1) else False
+
+    @staticmethod
+    def tournament_exists(tournament_id):
+        my_file = Path('data/' + str(tournament_id) + '.json')
+        if my_file.is_file():
+            return True
 
     @staticmethod
     def load_tournament_players(tournament_id):

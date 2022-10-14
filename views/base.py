@@ -64,10 +64,10 @@ class View:
         print('Create new tour')
         tour = dict()
         try:
-            tour['date_begin'] = \
-                vui("Begin date (dd-mm-yyyy hh:mm:ss) : ",
-                    type_=str,
-                    regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
+            tour['date_begin'] = vui(
+                "Begin date (dd-mm-yyyy hh:mm:ss) : ",
+                type_=str,
+                regex=r'\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}')
             # check if the date is correct
             datetime.strptime(tour['date_begin'], '%d-%m-%Y %H:%M:%S')
         except ValueError:
@@ -149,15 +149,13 @@ class View:
 
     @staticmethod
     def menu():
-        txt_menu = Text(
-            "\n"
-            "[1] Create tournament\n"
-            "[2] Add player to current tournament\n"
-            "[3] Create round / update scores\n"
-            "[4] Update players rank\n"
-            "[5] Display reports\n"
-            "[0] Exit\n"
-        )
+        txt_menu = Text("\n"
+                        "[1] Create tournament\n"
+                        "[2] Add player to current tournament\n"
+                        "[3] Create round / update scores\n"
+                        "[4] Update players rank\n"
+                        "[5] Display reports\n"
+                        "[0] Exit\n")
         txt_menu.stylize("green")
         View.console.print(txt_menu)
 
@@ -166,15 +164,13 @@ class View:
 
     @staticmethod
     def menu_reports():
-        txt_menu_report = Text(
-            "\n"
-            "[1] All players report\n"
-            "[2] Tournaments report\n"
-            "[3] Tournament's players report\n"
-            "[4] Tournament's rounds report\n"
-            "[5] Tournament's matches report\n"
-            "[0] Exit reports\n"
-        )
+        txt_menu_report = Text("\n"
+                               "[1] All players report\n"
+                               "[2] Tournaments report\n"
+                               "[3] Tournament's players report\n"
+                               "[4] Tournament's rounds report\n"
+                               "[5] Tournament's matches report\n"
+                               "[0] Exit reports\n")
         txt_menu_report.stylize("sandy_brown")
         View.console.print(txt_menu_report)
 
@@ -182,23 +178,30 @@ class View:
         return option
 
     @staticmethod
-    def players_report(players):
-        table = Table(title="List of players")
+    def players_report(players, tnmt_id=None):
+        """
+        Display players report or tournament's players report
+        """
+        # If tournament players report add column score
+        if tnmt_id:
+            table = Table(title=f"Tournament {tnmt_id}: list of players")
+        else:
+            table = Table(title="List of players")
         table.add_column("Id", style="magenta")
         table.add_column("Firstname", style="cyan")
         table.add_column("Lastname", style="cyan")
         table.add_column("Birthdate", style="cyan")
         table.add_column("Gender", style="cyan")
         table.add_column("Rank", justify="right", style="cyan")
+        table.add_column("Score", justify="right", style="cyan")
         for player in players:
-            table.add_row(
-                str(player['_Player__uid']),
-                str(player['firstname']),
-                str(player['lastname']),
-                str(player['birthdate']),
-                str(player['gender']),
-                str(player['_Player__rank'])
-            )
+            if not tnmt_id:
+                player['_Player__score'] = 'NA'
+            table.add_row(str(player['_Player__uid']),
+                          str(player['firstname']), str(player['lastname']),
+                          str(player['birthdate']), str(player['gender']),
+                          str(player['_Player__rank']),
+                          str(player['_Player__score']))
         print()
         View.console.print(table)
 
@@ -211,13 +214,10 @@ class View:
         table.add_column("Nb of matches", style="cyan")
         table.add_column("State", style="cyan")
         for round_ in rounds:
-            table.add_row(
-                str(round_['tour_id']),
-                str(round_['date_begin']),
-                str(round_['date_end']),
-                str(len(round_['matches'])),
-                "In progress" if str(round_['active']) == '1' else "Ended"
-            )
+            table.add_row(str(round_['tour_id']), str(round_['date_begin']),
+                          str(round_['date_end']), str(len(round_['matches'])),
+                          "In progress" if str(
+                              round_['active']) == '1' else "Ended")
         print()
         View.console.print(table)
 
@@ -230,22 +230,20 @@ class View:
         table.add_column("Player 2", style="cyan")
         table.add_column("Score player 2", style="cyan")
         for match in matches:
-            table.add_row(
-                str(match['tour_id']),
-                str(match['player_1_firstname']) + ' ' + str(
-                    match['player_1_lastname']),
-                str(match['_Match__score_match_player_1']),
-                str(match['player_2_firstname']) + ' ' + str(
-                    match['player_2_lastname']),
-                str(match['_Match__score_match_player_2'])
-            )
+            table.add_row(str(match['tour_id']),
+                          str(match['player_1_firstname']) + ' ' + str(
+                              match['player_1_lastname']),
+                          str(match['_Match__score_match_player_1']),
+                          str(match['player_2_firstname']) + ' ' + str(
+                              match['player_2_lastname']),
+                          str(match['_Match__score_match_player_2']))
         print()
         View.console.print(table)
 
     @staticmethod
     def tournaments_report(tournaments):
         table = Table(title="List of tournaments")
-        table.add_column("Name", style="magenta")
+        table.add_column("Id", style="magenta")
         table.add_column("Name", style="cyan")
         table.add_column("Place", style="cyan")
         table.add_column("Begin date", style="cyan", no_wrap=True)
@@ -255,23 +253,22 @@ class View:
         table.add_column("Description", style="cyan")
         table.add_column("State", style="cyan")
         for tournament in tournaments:
-            table.add_row(
-                str(tournament['id']),
-                str(tournament['name']),
-                str(tournament['place']),
-                str(tournament['date_begin']),
-                str(tournament['date_end']),
-                str(tournament['nb_tours']),
-                str(tournament['tournament_type']),
-                str(tournament['description']),
-                "In progress" if str(tournament['active']) == '1' else "Ended"
-            )
+            table.add_row(str(tournament['id']), str(tournament['name']),
+                          str(tournament['place']),
+                          str(tournament['date_begin']),
+                          str(tournament['date_end']),
+                          str(tournament['nb_tours']),
+                          str(tournament['tournament_type']),
+                          str(tournament['description']),
+                          "In progress" if str(
+                              tournament['active']) == '1' else "Ended")
         print()
         View.console.print(table)
 
     @staticmethod
     def prompt_report_sort_order():
-        order = vui("Sort by rank ('y') or lastname (default)? ", type_=str.lower)
+        order = vui("Sort by rank ('y') or lastname (default)? ",
+                    type_=str.lower)
         return True if order == 'y' else False
 
     @staticmethod

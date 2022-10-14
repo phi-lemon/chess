@@ -69,4 +69,3 @@ class Player:
     def load_players(cls):
         players = cls.PLAYERS_LIST.all()
         return players
-

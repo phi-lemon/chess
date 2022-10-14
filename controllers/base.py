@@ -86,39 +86,13 @@ class Controller:
             date_end = self.view.prompt_for_end_date('Tournament')
             self.tournament.stop(date_end)
 
-    # def add_players(self):
-    #     # get nb of players already registered
-    #     nb_players = Player.get_players_nb(self.tournament)
-    #     player_id = nb_players + 1
-    #     p = self.view.prompt_for_player(player_id)
-    #     self.tournament.add_player(player_id, p['firstname'], p['lastname'],
-    #                                p['birthdate'], p['gender'], p['rank'])
-
     def add_players(self):
-        players = [{'id': 1, 'firstname': 'Titi', 'lastname': 'Durand',
-                    'birthdate': '07-05-76', 'gender': 'M', 'rank': 20},
-                   {'id': 2, 'firstname': 'Mathilde', 'lastname': 'Dupont',
-                    'birthdate': '04-07-95', 'gender': 'F', 'rank': 29},
-                   {'id': 3, 'firstname': 'Gaston', 'lastname': 'Martin',
-                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 1},
-                   {'id': 4, 'firstname': 'George', 'lastname': 'Harisson',
-                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 55},
-                   {'id': 5, 'firstname': 'John', 'lastname': 'Lennon',
-                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 29},
-                   {'id': 6, 'firstname': 'Alphonse', 'lastname': 'Daudet',
-                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 34},
-                   {'id': 7, 'firstname': 'Ringo', 'lastname': 'Star',
-                    'birthdate': '04-07-95', 'gender': 'M', 'rank': 76},
-                   {'id': 8, 'firstname': 'Dee Dee', 'lastname': 'Bridgewater',
-                    'birthdate': '04-07-95', 'gender': 'F', 'rank': 10}]
-
-        for p in players:
-            self.tournament.add_player(p['id'],
-                                       p['firstname'],
-                                       p['lastname'],
-                                       p['birthdate'],
-                                       p['gender'],
-                                       p['rank'])
+        # get nb of players already registered
+        nb_players = Player.get_players_nb(self.tournament)
+        player_id = nb_players + 1
+        p = self.view.prompt_for_player(player_id)
+        self.tournament.add_player(player_id, p['firstname'], p['lastname'],
+                                   p['birthdate'], p['gender'], p['rank'])
 
     def sort_reports(self, items):
         """
@@ -233,21 +207,33 @@ class Controller:
                 elif menu_reports == 3:
                     # load tournament players
                     tnmt_id = self.view.prompt_report_tournament_id()
-                    players = Tournament.load_tournament_players(tnmt_id)
-                    players = self.sort_reports(players)
-                    self.view.players_report(players)
+                    if Tournament.tournament_exists(tnmt_id):
+                        players = Tournament.load_tournament_players(tnmt_id)
+                        players = self.sort_reports(players)
+                        self.view.players_report(players, tnmt_id)
+                    else:
+                        self.view.print_message(
+                            "There is no tourmanent with this id")
 
                 elif menu_reports == 4:
                     # load tournament rounds
                     tnmt_id = self.view.prompt_report_tournament_id()
-                    rounds = Tournament.load_tournament_rounds(tnmt_id)
-                    self.view.rounds_report(tnmt_id, rounds)
+                    if Tournament.tournament_exists(tnmt_id):
+                        rounds = Tournament.load_tournament_rounds(tnmt_id)
+                        self.view.rounds_report(tnmt_id, rounds)
+                    else:
+                        self.view.print_message(
+                            "There is no tourmanent with this id")
 
                 elif menu_reports == 5:
                     # load tournament matches
                     tnmt_id = self.view.prompt_report_tournament_id()
-                    matches = Tournament.load_tournament_matches(tnmt_id)
-                    self.view.matches_report(tnmt_id, matches)
+                    if Tournament.tournament_exists(tnmt_id):
+                        matches = Tournament.load_tournament_matches(tnmt_id)
+                        self.view.matches_report(tnmt_id, matches)
+                    else:
+                        self.view.print_message(
+                            "There is no tourmanent with this id")
 
             menu = self.view.menu()
 
