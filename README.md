@@ -8,7 +8,7 @@ Chess championship is a Python desktop application to manage chess tourmanents.
 If you don't have python installed, download and install python from here : https://www.python.org/downloads/
 
 ```bash
-git clone https://github.com/phi-lemon/scrapbooks.git
+git clone https://github.com/phi-lemon/chess.git
 ```
 
 
