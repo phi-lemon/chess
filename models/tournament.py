@@ -1,11 +1,12 @@
+from models.serialize import serialize
 from tinydb import TinyDB, where, Query
 from pathlib import Path
 from models.player import Player
 from models.tour import Tour
-from models.serialize import serialize
 
 
 class Tournament:
+
     TRN_LIST = TinyDB('data/tournaments_list.json', indent=4)
 
     def __init__(self, name=None, place=None, date_begin=None, date_end=None,

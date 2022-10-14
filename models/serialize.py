@@ -1,3 +1,11 @@
+from pathlib import Path
+
+# Create the data folder if it does not exist
+data_path = Path.cwd() / 'data'
+if not Path.exists(data_path):
+    data_path.mkdir()
+
+
 def serialize(table, attr, *exclude_attr):
     """
     Serialize instance attributes in a dict and insert in db
