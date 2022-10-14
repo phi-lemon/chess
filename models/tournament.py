@@ -1,6 +1,6 @@
 from models.player import Player
 from models.tour import Tour
-from tinydb import TinyDB, where
+from tinydb import TinyDB, where, Query
 from models.serialize import serialize
 
 
@@ -167,10 +167,36 @@ class Tournament:
         players = db.table("Players").all()
         return players
 
+    @staticmethod
+    def load_tournament_rounds(tournament_id):
+        db = TinyDB('data/' + str(tournament_id) + '.json')
+        rounds = db.table("Tours").all()
+        return rounds
+
+    @staticmethod
+    def load_tournament_matches(tournament_id):
+        db = TinyDB('data/' + str(tournament_id) + '.json')
+        matches = db.table("Matches").all()
+        players = db.table("Players")
+        q = Query()
+        for match in matches:
+            match['player_1_lastname'] = \
+                players.get(q.player_id == match['id_player_1'])['lastname']
+            match['player_1_firstname'] = \
+                players.get(q.player_id == match['id_player_1'])['firstname']
+            match['player_2_lastname'] = \
+                players.get(q.player_id == match['id_player_2'])['lastname']
+            match['player_2_firstname'] = \
+                players.get(q.player_id == match['id_player_2'])['firstname']
+        return matches
+
     @classmethod
     def load_tournaments(cls):
         tournaments = []
         for i in range(len(cls.TRN_LIST)):
-            db = TinyDB('data/' + str(i + 1) + '.json')
-            tournaments.append(db.table("Tournaments").all())
+            tnmt_id = i + 1
+            db = TinyDB('data/' + str(tnmt_id) + '.json')
+            tournament = db.table("Tournaments").all()[0]
+            tournament['id'] = tnmt_id
+            tournaments.append(tournament)
         return tournaments

@@ -203,26 +203,68 @@ class View:
         View.console.print(table)
 
     @staticmethod
+    def rounds_report(tnmt_id, rounds):
+        table = Table(title=f"Tournament {tnmt_id}: List of rounds")
+        table.add_column("Id", style="magenta")
+        table.add_column("Begin date", style="cyan", no_wrap=True)
+        table.add_column("End Date", style="cyan", no_wrap=True)
+        table.add_column("Nb of matches", style="cyan")
+        table.add_column("State", style="cyan")
+        for round_ in rounds:
+            table.add_row(
+                str(round_['tour_id']),
+                str(round_['date_begin']),
+                str(round_['date_end']),
+                str(len(round_['matches'])),
+                "In progress" if str(round_['active']) == '1' else "Ended"
+            )
+        print()
+        View.console.print(table)
+
+    @staticmethod
+    def matches_report(tnmt_id, matches):
+        table = Table(title=f"Tournament {tnmt_id}: List of matches")
+        table.add_column("Round Id", style="magenta")
+        table.add_column("Player 1", style="cyan")
+        table.add_column("Score player 1", style="cyan")
+        table.add_column("Player 2", style="cyan")
+        table.add_column("Score player 2", style="cyan")
+        for match in matches:
+            table.add_row(
+                str(match['tour_id']),
+                str(match['player_1_firstname']) + ' ' + str(
+                    match['player_1_lastname']),
+                str(match['_Match__score_match_player_1']),
+                str(match['player_2_firstname']) + ' ' + str(
+                    match['player_2_lastname']),
+                str(match['_Match__score_match_player_2'])
+            )
+        print()
+        View.console.print(table)
+
+    @staticmethod
     def tournaments_report(tournaments):
         table = Table(title="List of tournaments")
+        table.add_column("Name", style="magenta")
         table.add_column("Name", style="cyan")
         table.add_column("Place", style="cyan")
-        table.add_column("Begin date", style="cyan")
-        table.add_column("End Date", style="cyan")
+        table.add_column("Begin date", style="cyan", no_wrap=True)
+        table.add_column("End Date", style="cyan", no_wrap=True)
         table.add_column("Number of rounds", justify="right", style="cyan")
         table.add_column("Type", style="cyan")
         table.add_column("Description", style="cyan")
         table.add_column("State", style="cyan")
         for tournament in tournaments:
             table.add_row(
-                str(tournament[0]['name']),
-                str(tournament[0]['place']),
-                str(tournament[0]['date_begin']),
-                str(tournament[0]['date_end']),
-                str(tournament[0]['nb_tours']),
-                str(tournament[0]['tournament_type']),
-                str(tournament[0]['description']),
-                "In progress" if str(tournament[0]['active']) == '1' else "Ended"
+                str(tournament['id']),
+                str(tournament['name']),
+                str(tournament['place']),
+                str(tournament['date_begin']),
+                str(tournament['date_end']),
+                str(tournament['nb_tours']),
+                str(tournament['tournament_type']),
+                str(tournament['description']),
+                "In progress" if str(tournament['active']) == '1' else "Ended"
             )
         print()
         View.console.print(table)
@@ -233,6 +275,6 @@ class View:
         return True if order == 'y' else False
 
     @staticmethod
-    def prompt_report_tournament_players():
+    def prompt_report_tournament_id():
         tournament_id = vui("Tournament id: ", type_=int)
         return tournament_id

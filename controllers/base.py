@@ -141,6 +141,7 @@ class Controller:
         """
         menu = self.view.menu()
         while menu != 0:
+
             if menu == 1:
                 # Create tournament
                 # Is there an active tournament?
@@ -148,6 +149,7 @@ class Controller:
                     self.view.print_message("A tournament is already active.")
                 else:
                     self.create_tournament()
+
             elif menu == 2:
                 # do not add players if a round is already created
                 # todo create function
@@ -161,6 +163,7 @@ class Controller:
                     self.view.print_message(
                         "Create a tournament is required before adding "
                         "players.")
+
             elif menu == 3:
                 # Create round or update score
                 # Need players
@@ -193,6 +196,7 @@ class Controller:
                             if (len(self.tournament.table_tours)
                                     < self.tournament.nb_tours):
                                 self.create_tour_and_matches()
+
             elif menu == 4:
                 # update player rank in players list
                 if Player.get_total_players_nb() == 0:
@@ -212,11 +216,9 @@ class Controller:
                             "A problem occured. Please check player uid")
 
             elif menu == 5:
-                # if Tournament.is_active_tournament():
-                #     self.view.print_message("A tournament is already active.")
-
                 # generate reports
                 menu_reports = self.view.menu_reports()
+
                 if menu_reports == 1:
                     # load all players
                     players = Player.load_players()
@@ -226,21 +228,26 @@ class Controller:
                 elif menu_reports == 2:
                     # load tournaments
                     tournaments = Tournament.load_tournaments()
-                    print(tournaments)
                     self.view.tournaments_report(tournaments)
 
                 elif menu_reports == 3:
                     # load tournament players
-                    tnmt_id = self.view.prompt_report_tournament_players()
+                    tnmt_id = self.view.prompt_report_tournament_id()
                     players = Tournament.load_tournament_players(tnmt_id)
                     players = self.sort_reports(players)
                     self.view.players_report(players)
-                elif menu_reports == 3:
-                    pass
+
                 elif menu_reports == 4:
-                    pass
+                    # load tournament rounds
+                    tnmt_id = self.view.prompt_report_tournament_id()
+                    rounds = Tournament.load_tournament_rounds(tnmt_id)
+                    self.view.rounds_report(tnmt_id, rounds)
+
                 elif menu_reports == 5:
-                    pass
+                    # load tournament matches
+                    tnmt_id = self.view.prompt_report_tournament_id()
+                    matches = Tournament.load_tournament_matches(tnmt_id)
+                    self.view.matches_report(tnmt_id, matches)
 
             menu = self.view.menu()
 
