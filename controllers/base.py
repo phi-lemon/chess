@@ -56,6 +56,11 @@ class Controller:
             match_id += 1
 
     def maj_scores(self, tour):
+        """
+        Update scores of all matches of a round
+        :param tour: tour instance
+        :return: None
+        """
         # tour.matches is a dict but stored in db as a list
         for i in range(len(tour.matches)):
             id_player_1 = tour.matches[i + 1].id_player_1

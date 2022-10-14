@@ -55,13 +55,12 @@ class Tour:
                   tournament_match_id):
         """
         Creates a match and add it to tour's matches dict
-        Method called from the controller
         :param match_id: match identifier for the round
-        :param id_player_1:
-        :param id_player_2:
+        :param id_player_1: id player 1
+        :param id_player_2: id playuer 2
         :param tournament_match_id: unique match identifier
         for the tournament
-        :return:
+        :return: None
         """
         self.matches[match_id] = Match(match_id, self, id_player_1,
                                        id_player_2, tournament_match_id)
